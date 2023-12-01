@@ -7,14 +7,16 @@ export const Container = styled.div`
   background-color: #cccccc;
   padding: 12px;
   max-width: 350px;
-  overflow: scroll;
+  overflow: hidden;
 `;
 
-export const PuzzleBlock = styled.div<{ backgroundColor?: boolean }>`
+export const PuzzleBlock = styled.div<{ x?: number; y?: number }>`
   min-width: 100px;
   height: 100px;
   border: 1px solid #ffffff;
   margin-right: 12px;
-  background-color: ${({ backgroundColor }) =>
-    backgroundColor ? "#ffffff" : "none"};
+  z-index: 99;
+  cursor: move;
+  transform: translateX(${({ x }) => (x ? x : 0)}px)
+  transform: translateY(${({ y }) => (y ? y : 0)}px)
 `;
