@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Container = styled.ul`
+export const Container = styled.div`
   background-color: #cccccc;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -8,8 +8,8 @@ export const Container = styled.ul`
   width: 500px;
 `;
 
-export const Content = styled.li`
+export const Content = styled.img`
   background-color: #ffffff;
-  width: 30px;
-  height: 30px;
+  width: 70px;
+  height: 70px;
 `;
