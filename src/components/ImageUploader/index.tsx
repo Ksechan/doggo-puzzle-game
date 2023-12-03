@@ -66,8 +66,8 @@ const ImageUploader = () => {
       reader.onload = async () => {
         const resizedImage = await resizeImage(
           reader.result as string,
-          500,
-          500
+          363,
+          363
         );
         setSelectedImg(resizedImage);
 
@@ -83,7 +83,9 @@ const ImageUploader = () => {
 
   return (
     <div>
-      <label htmlFor="image-input">사진을 선택해주세요</label>
+      <Styled.UploadButton htmlFor="image-input">
+        사진을 선택해주세요
+      </Styled.UploadButton>
       <Styled.Input
         id="image-input"
         type="file"
