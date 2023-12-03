@@ -6,6 +6,7 @@ import {
   puzzleDragState,
   puzzleDragCompleteState,
 } from "../../atom/puzzleState";
+import { getDelta, isTouchScreen } from "../../util";
 
 export interface PuzzleListType {
   dataUrl: string;
@@ -24,130 +25,134 @@ const PuzzleList = () => {
     puzzleDragCompleteState
   );
   const [puzzleList, setPuzzleList] = useState<PuzzleListType[]>([]);
-  const [position, setPosition] = useState({
-    x: 0,
-    y: 0,
+  const [keyDown, setKeyDown] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [puzzle, setPuzzle] = useState<PuzzleListType>({
+    index: 0,
+    dataUrl: "",
   });
-  const [touchStart, setTouchStart] = useState(false);
 
-  // PC
-  const onDragStart = (item: PuzzleListType) => {
-    setPuzzleDrag(item);
-  };
+  let clickTimeout: number | undefined;
 
-  const onDragEnd = () => {
-    puzzleDragCompleteValue
-      ? setPuzzleList((prev) => prev.filter((_, index) => index !== 0))
-      : null;
-    resetPuzzleDrag();
-    setPuzzleDragCompleteValue(false);
-  };
+  // 드래그 이벤트 시작
+  const onStart = () => {
+    const startEventName = isTouchScreen ? "touchstart" : "mousedown";
+    const moveDragName = isTouchScreen ? "touchmove" : "mousemove";
+    const endDragName = isTouchScreen ? "touchend" : "mouseup";
 
-  // 모바일
-  const onTouchStart = (e: React.TouchEvent, puzzle: PuzzleListType) => {
-    setPuzzleDrag(puzzle);
-    const dropAreaList =
-      document.querySelectorAll<HTMLElement>(".dnd-drop-area");
-    setTouchStart(true);
-    const item = e.currentTarget as HTMLElement;
-    // if (
-    //   !item.classList.contains("dnd-drag-item") ||
-    //   item.classList.contains("ghost") ||
-    //   item.classList.contains("placeholder")
-    // ) {
-    //   return;
-    // }
+    const onDragStartHandler = (
+      startEvent: TouchEvent | MouseEvent
+      // puzzle: PuzzleListType
+    ) => {
+      const dropAreaList =
+        document.querySelectorAll<HTMLElement>(".dnd-drop-area");
+      const item = startEvent.target as HTMLElement;
+      startEvent.stopPropagation();
 
-    const itemRect = item.getBoundingClientRect();
+      const itemRect = item.getBoundingClientRect();
 
-    // --- 이동 아이템 만들기 시작
-    const ghostItem = item.cloneNode(true) as HTMLElement;
-    ghostItem.classList.add("ghost");
-    ghostItem.style.position = "fixed";
-    ghostItem.style.top = `${itemRect.top}px`;
-    ghostItem.style.left = `${itemRect.left}px`;
-    ghostItem.style.pointerEvents = "none";
-    ghostItem.style.textShadow = "0 30px 60px rgba(0, 0, 0, .3)";
-    ghostItem.style.transform = "scale(1.05)";
-    ghostItem.style.transition = "transform 200ms ease";
+      const ghostItem = item.cloneNode(true) as HTMLElement;
 
-    item.style.opacity = "0.5";
-    item.style.cursor = "grabbing";
-
-    document.body.style.cursor = "grabbing";
-    document.body.appendChild(ghostItem);
-    // --- 이동 아이템 만들기 끝
-
-    const touchMoveHandler = (moveEvent: TouchEvent) => {
-      // setPosition({
-      //   x: moveEvent.touches[0].pageX - e.touches[0].pageX,
-      //   y: moveEvent.touches[0].pageY - e.touches[0].pageY,
-      // });
-      const deltaX = moveEvent.touches[0].pageX - e.touches[0].pageX;
-      const deltaY = moveEvent.touches[0].pageY - e.touches[0].pageY;
-
-      ghostItem.style.top = `${itemRect.top + deltaY}px`;
-      ghostItem.style.left = `${itemRect.left + deltaX}px`;
-      if (moveEvent.cancelable) moveEvent.preventDefault();
-
-      //--- Drop 영역 확인
-      const ghostItemRect = ghostItem.getBoundingClientRect();
-      const ghostCenterX = ghostItemRect.left + ghostItemRect.width / 2;
-      const ghostCenterY = ghostItemRect.top + ghostItemRect.height / 2;
-
-      const dropItem = document
-        .elementFromPoint(ghostCenterX, ghostCenterY)
-        ?.closest<HTMLElement>(".dnd-drop-area");
-
-      dropAreaList.forEach((area) => {
-        area.classList.remove("active");
-        area.removeAttribute("style");
-      });
-
-      if (dropItem) {
-        dropItem.classList.add("active");
-        dropItem.style.filter = "drop-shadow(16px 16px 16px gray)";
-      }
-      //--- Drop 영역 확인 END
-    };
-    const touchEndHandler = (endEvent: TouchEvent) => {
-      const dropItem = document.querySelector<HTMLElement>(
-        ".dnd-drop-area.active"
-      );
-      const isCorrect =
-        puzzle.index - 1 ===
-        Number(dropItem?.classList[dropItem.classList.length - 2]);
-
-      isCorrect ? dropItem?.setAttribute("src", puzzle.dataUrl) : null;
-
-      // 수정필
-      ghostItem.style.left = `${itemRect.left}px`;
+      ghostItem.classList.add("ghost");
+      ghostItem.style.position = "fixed";
       ghostItem.style.top = `${itemRect.top}px`;
+      ghostItem.style.left = `${itemRect.left}px`;
+      ghostItem.style.pointerEvents = "none";
+      ghostItem.style.transition = "transform 200ms ease";
+      ghostItem.style.zIndex = "9999";
+      document.body.style.cursor = "grabbing";
+      document.body.appendChild(ghostItem);
+      // 수정 필
+      clickTimeout = setTimeout(() => {
+        ghostItem.style.boxShadow = "0 30px 60px rgba(0, 0, 0, .3)";
+        ghostItem.style.transform = "scale(1.1)";
+      }, 500);
 
-      ghostItem.style.transition = "all 200ms ease";
-      ghostItem.style.transform = "none";
+      const touchMoveHandler = (moveEvent: TouchEvent | MouseEvent) => {
+        clearTimeout(clickTimeout);
+        setKeyDown(false);
+        const deltaX = getDelta(startEvent, moveEvent).deltaX;
+        const deltaY = getDelta(startEvent, moveEvent).deltaY;
 
-      document.addEventListener(
-        "transitionend",
-        () => {
-          item.removeAttribute("style");
-          document.body.removeAttribute("style");
-          ghostItem.remove();
-        },
-        { once: true }
-      );
-      // setPosition({
-      //   x: 0,
-      //   y: 0,
-      // });
+        ghostItem.style.top = `${itemRect.top + deltaY}px`;
+        ghostItem.style.left = `${itemRect.left + deltaX}px`;
+        if (moveEvent.cancelable) moveEvent.preventDefault();
 
-      setTouchStart(false);
+        //--- Drop 영역 확인
+        const ghostItemRect = ghostItem.getBoundingClientRect();
+        const ghostCenterX = ghostItemRect.left + ghostItemRect.width / 2;
+        const ghostCenterY = ghostItemRect.top + ghostItemRect.height / 2;
+
+        const dropItem = document
+          .elementFromPoint(ghostCenterX, ghostCenterY)
+          ?.closest<HTMLElement>(".dnd-drop-area");
+
+        dropAreaList.forEach((area) => {
+          area.classList.remove("active");
+          area.removeAttribute("style");
+        });
+
+        if (dropItem) {
+          dropItem.classList.add("active");
+          dropItem.style.opacity = "0.5";
+        }
+        //--- Drop 영역 확인 END
+      };
+      const touchEndHandler = () => {
+        clearTimeout(clickTimeout);
+        document.removeEventListener(moveDragName, touchMoveHandler);
+        setKeyDown(false);
+        const dropItem = document.querySelector<HTMLElement>(
+          ".dnd-drop-area.active"
+        );
+        // const dropItemm = document.querySelector<HTMLElement>(".dnd-drop-area");
+        const isComplete =
+          puzzle.index - 1 ===
+          Number(dropItem?.classList[dropItem.classList.length - 2]);
+
+        if (!isComplete) {
+          ghostItem.style.left = `${itemRect.left}px`;
+          ghostItem.style.top = `${itemRect.top}px`;
+        } else {
+          setTimeout(() => {
+            dropItem?.setAttribute("src", puzzle.dataUrl);
+          }, 150);
+          ghostItem.style.left = `${
+            !!dropItem && dropItem.getBoundingClientRect().left
+          }px`;
+          ghostItem.style.top = `${
+            !!dropItem && dropItem.getBoundingClientRect().top
+          }px`;
+          setPuzzleList((prev) => prev.filter((_, index) => index !== 0));
+        }
+
+        ghostItem.style.transition = "all 200ms ease";
+        ghostItem.style.transform = "none";
+
+        document.addEventListener(
+          "transitionend",
+          () => {
+            ghostItem.remove();
+            dropItem && dropItem.removeAttribute("style");
+            item.removeAttribute("style");
+            document.body.removeAttribute("style");
+          },
+          { once: true }
+        );
+        setReady(false);
+      };
+
+      clickTimeout = setTimeout(() => {
+        document.addEventListener(moveDragName, touchMoveHandler, {
+          passive: false,
+        });
+      }, 500);
+      document.addEventListener(endDragName, touchEndHandler, { once: true });
     };
 
-    document.addEventListener("touchmove", touchMoveHandler, {
-      passive: false,
-    });
-    document.addEventListener("touchend", touchEndHandler, { once: true });
+    document.addEventListener(startEventName, onDragStartHandler);
+    return () =>
+      document.removeEventListener(startEventName, onDragStartHandler);
   };
 
   const shuffle = (array: PuzzleListType[]) => {
@@ -164,39 +169,41 @@ const PuzzleList = () => {
     shuffle([...puzzleValue]);
   }, []);
 
+  useEffect(() => {
+    if (ready) {
+      const cleanup = onStart();
+
+      return () => cleanup();
+    }
+  }, [ready]);
+
   return (
-    <>
-      <Styled.Container>
+    <Styled.PuzzleBlockWrap>
+      <Styled.Content>
         {puzzleList.map((item, idx) => {
           return (
             <Styled.PuzzleBlock
+              className="placeholder"
               key={item.index}
-              draggable
-              onDragStart={(e) => {
-                if (idx !== 0) {
-                  e.preventDefault();
+              onMouseDown={() => {
+                if (idx === 0) {
+                  setPuzzle(item);
+                  setReady(true);
                 }
-                onDragStart(item);
               }}
-              onDragEnd={() => {
-                onDragEnd();
-              }}
-              onTouchStart={(e) => idx === 0 && onTouchStart(e, item)}
-              style={{
-                transform: `${
-                  idx === 0 &&
-                  `translateX(${position.x}px) translateY(${position.y}px)`
-                }`,
-                transition: `${!touchStart && "all 200ms ease"}`,
-                zIndex: 9999,
+              onTouchStart={() => {
+                if (idx === 0) {
+                  setPuzzle(item);
+                  setReady(true);
+                }
               }}
             >
-              <img src={item.dataUrl} style={{ width: 100, height: 100 }} />
+              <Styled.PuzzleBlockImg src={item.dataUrl} />
             </Styled.PuzzleBlock>
           );
         })}
-      </Styled.Container>
-    </>
+      </Styled.Content>
+    </Styled.PuzzleBlockWrap>
   );
 };
 

@@ -1,22 +1,33 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
+export const Content = styled.div`
   display: flex;
   align-items: center;
   justify-content: start;
-  background-color: #cccccc;
-  padding: 12px;
-  max-width: 350px;
-  overflow: hidden;
+  background-color: #f7f7f7;
+  padding: 30px;
+  width: 390px;
+  overflow: scroll;
+  padding: 8px;
 `;
 
-export const PuzzleBlock = styled.div<{ x?: number; y?: number }>`
-  min-width: 100px;
-  height: 100px;
+export const PuzzleBlock = styled.button`
+  width: 121px;
+  height: 121px;
   border: 1px solid #ffffff;
   margin-right: 12px;
   z-index: 99;
   cursor: move;
-  transform: translateX(${({ x }) => (x ? x : 0)}px)
-  transform: translateY(${({ y }) => (y ? y : 0)}px)
+`;
+
+export const PuzzleBlockImg = styled.img`
+  width: 121px;
+  height: 121px;
+`;
+
+export const PuzzleBlockWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
