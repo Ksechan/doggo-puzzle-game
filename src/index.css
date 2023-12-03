@@ -104,7 +104,6 @@ section {
 }
 body {
   line-height: 1;
-  background-color: #242424;
 }
 ol,
 ul {
@@ -131,5 +130,9 @@ img {
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
-  user-drag: none;
+  /* user-drag: none; */
+}
+
+img[src=""] {
+  display: none;
 }
