@@ -12,19 +12,27 @@ export const PuzzleArea = styled.div<{ border?: boolean }>`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
-  width: 363px;
+  width: 345px;
   border-radius: 16px;
   border: ${({ border }) => (border ? "none" : "1px solid #ffffff")};
   overflow: hidden;
+
+  @media screen and (min-width: 1024px) {
+    width: 480px;
+  }
 `;
 
 export const Content = styled.div<{ border: boolean }>`
   background-color: #e9e9e9;
-  width: 121px;
-  height: 121px;
+  width: 115px;
+  height: 115px;
   border: ${({ border }) => (border ? "none" : "1px solid #ffffff")};
   box-sizing: border-box;
-  z-index: 9;
+
+  @media screen and (min-width: 1024px) {
+    width: 160px;
+    height: 160px;
+  }
 `;
 
 export const Container = styled.div`

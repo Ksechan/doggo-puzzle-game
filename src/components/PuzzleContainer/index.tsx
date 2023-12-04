@@ -12,8 +12,11 @@ const PuzzleContainer = () => {
     <Styled.Container>
       <Header />
       <Styled.PuzzleAreaWrap>
-        <Styled.PuzzleArea border={puzzleCompleteValue}>
-          {[...Array(9).keys()].map((key, index) => {
+        <Styled.PuzzleArea
+          border={puzzleCompleteValue}
+          className="dnd-drop-wrap"
+        >
+          {[...Array(9).keys()].map((_, index) => {
             return (
               <Styled.Content
                 className={`dnd-drop-area ${index}`}
@@ -23,6 +26,7 @@ const PuzzleContainer = () => {
             );
           })}
         </Styled.PuzzleArea>
+        <div className="item-wrap"></div>
         <Styled.Title>
           {puzzleCompleteValue && puzzleValue.length === 0
             ? "축하합니다!"
