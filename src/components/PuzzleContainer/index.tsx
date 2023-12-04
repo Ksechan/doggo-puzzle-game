@@ -1,47 +1,47 @@
-import { useRef, DragEvent } from "react";
 import * as Styled from "./style";
-import {
-  puzzleDragState,
-  puzzleState,
-  puzzleDragCompleteState,
-} from "../../atom/puzzleState";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { puzzleCompleteState, puzzleState } from "../../atom/puzzleState";
+import { useRecoilValue } from "recoil";
 import PuzzleList from "../PuzzleList";
 import Header from "../Header";
 
 const PuzzleContainer = () => {
-  const value = useRecoilValue(puzzleState);
-  // const dragValue = useRecoilValue(puzzleDragState);
-  // const dragComplete = useSetRecoilState(puzzleDragCompleteState);
+  const puzzleCompleteValue = useRecoilValue(puzzleCompleteState);
+  const puzzleValue = useRecoilValue(puzzleState);
 
   return (
     <Styled.Container>
       <Header />
       <Styled.PuzzleAreaWrap>
-        <Styled.PuzzleArea>
+        <Styled.PuzzleArea border={puzzleCompleteValue}>
           {[...Array(9).keys()].map((key, index) => {
             return (
               <Styled.Content
                 className={`dnd-drop-area ${index}`}
                 key={index}
+                border={puzzleCompleteValue}
               />
             );
           })}
         </Styled.PuzzleArea>
-        <Styled.Title>퍼즐 조각</Styled.Title>
+        <Styled.Title>
+          {puzzleCompleteValue && puzzleValue.length === 0
+            ? "축하합니다!"
+            : "퍼즐 조각"}
+        </Styled.Title>
         <Styled.subtitle>
-          조각을 꾹 눌러서 위 퍼즐판에 넣고 뺄 수 있어요!
+          {puzzleCompleteValue && puzzleValue.length === 0
+            ? "퍼즐 맞추기에 성공하셨습니다!!"
+            : "조각을 꾹 눌러서 위 퍼즐판에 넣고 뺄 수 있어요!"}
         </Styled.subtitle>
+        {puzzleCompleteValue && puzzleValue.length === 0 ? (
+          <Styled.RetryButtonWrap>
+            <Styled.Retry onClick={() => location.reload()}>
+              다시하기
+            </Styled.Retry>
+          </Styled.RetryButtonWrap>
+        ) : null}
       </Styled.PuzzleAreaWrap>
-      {value.length > 0 && (
-        <>
-          <PuzzleList />
-          <Styled.ButtonWrap>
-            <Styled.ListByeButton>이 사진 그만 볼래요</Styled.ListByeButton>
-            <Styled.ListPassButton>넘기기</Styled.ListPassButton>
-          </Styled.ButtonWrap>
-        </>
-      )}
+      {!puzzleCompleteValue && puzzleValue.length !== 0 ? <PuzzleList /> : null}
     </Styled.Container>
   );
 };
