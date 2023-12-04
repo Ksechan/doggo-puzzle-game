@@ -6,6 +6,12 @@ export const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 30px 20px;
+  box-sizing: border-box;
+
+  @media screen and (min-width: 1024px) {
+    width: 480px;
+    padding: 40px 20px;
+  }
 `;
 
 export const LeftWrap = styled.div`
@@ -21,4 +27,9 @@ export const RightWrap = styled.div`
 export const Icon = styled.img`
   width: 20px;
   height: 20px;
+
+  @media screen and (min-width: 1024px) {
+    width: 32px;
+    height: 32px;
+  }
 `;
