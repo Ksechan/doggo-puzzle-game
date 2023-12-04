@@ -9,20 +9,33 @@ export const Content = styled.div`
   width: 390px;
   overflow: scroll;
   padding: 8px;
+
+  @media screen and (min-width: 1024px) {
+    width: 496px;
+  }
 `;
 
 export const PuzzleBlock = styled.button`
-  min-width: 121px;
-  min-height: 121px;
+  min-width: 115px;
+  min-height: 115px;
   border: 1px solid #ffffff;
   margin-right: 24px;
+
+  @media screen and (min-width: 1024px) {
+    min-width: 160px;
+    min-height: 160px;
+  }
 `;
 
 export const PuzzleBlockImg = styled.img`
-  width: 121px;
-  height: 121px;
-  &:hover {
-    cursor: move;
+  width: 115px;
+  height: 115px;
+  background-color: #f7f7f7;
+  cursor: move;
+
+  @media screen and (min-width: 1024px) {
+    width: 160px;
+    height: 160px;
   }
 `;
 
@@ -38,6 +51,10 @@ export const ButtonWrap = styled.div`
   align-items: center;
   margin-top: 20px;
   width: 363px;
+
+  @media screen and (min-width: 1024px) {
+    width: 480px;
+  }
 `;
 
 export const ListPassButton = styled.button`

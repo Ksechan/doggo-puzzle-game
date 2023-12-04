@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import * as Styled from "./style";
-import {
-  useRecoilValue,
-  useSetRecoilState,
-  useRecoilState,
-  useResetRecoilState,
-} from "recoil";
+import { useRecoilValue, useSetRecoilState, useResetRecoilState } from "recoil";
 import { puzzleCompleteState, puzzleState } from "../../atom/puzzleState";
 import { getDelta, isTouchScreen } from "../../util";
 
@@ -29,6 +24,7 @@ const PuzzleList = () => {
     dataUrl: "",
   });
   const [puzzlePassCount, setPuzzlePassCount] = useState(0);
+  const [currentPuzzle, setCurrentPuzzle] = useState<number[]>([]);
 
   let clickTimeout: number | undefined;
 
@@ -43,30 +39,28 @@ const PuzzleList = () => {
       const dropAreaList =
         document.querySelectorAll<HTMLElement>(".dnd-drop-area");
       const item = startEvent.target as HTMLElement;
+      console.log(startEvent);
 
       const itemRect = item.getBoundingClientRect();
 
-      const ghostItem = item.cloneNode(true) as HTMLElement;
-      // item.style.pointerEvents = "move";
-
-      // ghostItem.classList.add("ghost");
-      // ghostItem.style.position = "fixed";
       item.style.position = "fixed";
       item.style.top = `${itemRect.top}px`;
       item.style.left = `${itemRect.left}px`;
       item.style.transition = "transform 200ms ease";
-      item.style.zIndex = "9999";
       item.style.pointerEvents = "none";
-      // document.body.appendChild(ghostItem);
+      // 수정필요 두번터치해야함
+      document.body.style.touchAction = "none";
+      item.style.zIndex = "9999";
+      item.classList.add(puzzle.index.toString());
 
       const touchMoveHandler = (moveEvent: TouchEvent | MouseEvent) => {
         clearTimeout(clickTimeout);
-        // if (moveEvent.cancelable) moveEvent.preventDefault();
+        if (moveEvent.cancelable) moveEvent.preventDefault();
         const deltaX = getDelta(startEvent, moveEvent).deltaX;
         const deltaY = getDelta(startEvent, moveEvent).deltaY;
 
-        item.style.top = `${itemRect.y + deltaY}px`;
-        item.style.left = `${itemRect.x + deltaX}px`;
+        item.style.top = `${itemRect.top + deltaY}px`;
+        item.style.left = `${itemRect.left + deltaX}px`;
 
         //--- Drop 영역 확인
         const itemCurrentRect = item.getBoundingClientRect();
@@ -96,17 +90,29 @@ const PuzzleList = () => {
         const dropItem = document.querySelector<HTMLElement>(
           ".dnd-drop-area.active"
         );
-        // const isComplete =
-        //   puzzle.index - 1 ===
-        //   Number(dropItem?.classList[dropItem.classList.length - 2]);
+
+        const isComplete =
+          puzzle.index - 1 ===
+          Number(dropItem?.classList[dropItem.classList.length - 2]);
 
         // 제자리로 돌아가기
-        // ghostItem.style.left = `${itemRect.left}px`;
-        // ghostItem.style.top = `${itemRect.top}px`;
-        // dropItem?.removeAttribute("style");
-        item.style.left = `${dropItem?.getBoundingClientRect().left}px`;
-        item.style.top = `${dropItem?.getBoundingClientRect().top}px`;
-        // setPuzzleList((prev) => prev.filter((_, index) => index !== 0));
+        if (dropItem && !dropItem.firstChild) {
+          if (isComplete) {
+            setCurrentPuzzle((prev) => [...prev, puzzle.index]);
+          } else {
+            setCurrentPuzzle((prev) =>
+              prev.filter((item) => item !== puzzle.index)
+            );
+          }
+          dropItem?.appendChild(item);
+          onImagePass();
+
+          item.style.left = `${dropItem?.getBoundingClientRect().left}px`;
+          item.style.top = `${dropItem?.getBoundingClientRect().top}px`;
+        } else {
+          item.style.left = `${itemRect.left}px`;
+          item.style.top = `${itemRect.top}px`;
+        }
 
         item.style.transition = "all 200ms ease";
         item.style.transform = "none";
@@ -115,14 +121,12 @@ const PuzzleList = () => {
           "transitionend",
           () => {
             dropItem && dropItem.removeAttribute("style");
-            item.style.boxShadow = "0";
+            item.style.position = "static";
+            item.style.boxShadow = "none";
             item.style.transform = "scale(1)";
             item.style.pointerEvents = "auto";
-            document.body.removeAttribute("style");
-            if (puzzleList.length === 1) {
-              resetPuzzleValue();
-              setPuzzleComplete(true);
-            }
+            document.body.style.touchAction = "unset";
+            document.body.classList.remove("hidden");
           },
           { once: true }
         );
@@ -130,8 +134,8 @@ const PuzzleList = () => {
 
       // touch and holder
       clickTimeout = setTimeout(() => {
-        ghostItem.style.boxShadow = "0 30px 60px rgba(0, 0, 0, .3)";
-        ghostItem.style.transform = "scale(1.1)";
+        item.style.boxShadow = "0 30px 60px rgba(0, 0, 0, .3)";
+        item.style.transform = "scale(1.1)";
         document.addEventListener(moveDragName, touchMoveHandler, {
           passive: true,
         });
@@ -156,24 +160,27 @@ const PuzzleList = () => {
     setPuzzleList(array);
   };
 
-  const onImageVisible = () => {
-    if (puzzlePassCount < puzzleList.length) {
-      setPuzzlePassCount((prev) => prev + 1);
-      const item = puzzleList.splice(0, 1);
-      setPuzzleList((prev) => [...prev, item[0]]);
-    }
+  const onImageUnVisible = () => {
+    setPuzzlePassCount((prev) => prev + 1);
+    const item = puzzleList.splice(0, 1);
+    setPuzzleList((prev) => [...prev, item[0]]);
   };
 
   const onImagePass = () => {
-    if (puzzlePassCount < puzzleList.length) {
-      const oldArray = puzzleList;
-      const item = oldArray.slice(0, 1);
-      const newArray = oldArray
-        .slice(1, puzzleList.length - puzzlePassCount)
-        .concat(item[0], oldArray.slice(puzzleList.length - puzzlePassCount));
-      setPuzzleList(newArray);
-    }
+    const oldArray = puzzleList;
+    const item = oldArray.slice(0, 1);
+    const newArray = oldArray
+      .slice(1, puzzleList.length - puzzlePassCount)
+      .concat(item[0], oldArray.slice(puzzleList.length - puzzlePassCount));
+    setPuzzleList(newArray);
   };
+
+  useEffect(() => {
+    if (currentPuzzle.length === 9) {
+      resetPuzzleValue();
+      setPuzzleComplete(true);
+    }
+  }, [currentPuzzle]);
 
   useEffect(() => {
     shuffle([...puzzleValue]);
@@ -194,14 +201,17 @@ const PuzzleList = () => {
           return (
             <Styled.PuzzleBlock className="placeholder" key={item.index}>
               <Styled.PuzzleBlockImg
+                className={`${idx}`}
                 src={item.dataUrl}
                 onMouseDown={() => {
                   setPuzzle(item);
                   setReady(true);
                 }}
                 onTouchStart={() => {
-                  setPuzzle(item);
-                  setReady(true);
+                  if (idx === 0) {
+                    setPuzzle(item);
+                    setReady(true);
+                  }
                 }}
               />
             </Styled.PuzzleBlock>
@@ -209,7 +219,7 @@ const PuzzleList = () => {
         })}
       </Styled.Content>
       <Styled.ButtonWrap>
-        <Styled.ListByeButton type="button" onClick={onImageVisible}>
+        <Styled.ListByeButton type="button" onClick={onImageUnVisible}>
           이 사진 그만 볼래요
         </Styled.ListByeButton>
         <Styled.ListPassButton type="button" onClick={onImagePass}>
