@@ -21,8 +21,6 @@ const ImageUploader = () => {
       imageObj.onload = () => {
         const pieceWidth = imageObj.width / 3;
         const pieceHeight = imageObj.height / 3;
-        // setBlockWidth(pieceWidth);
-        // setBlockHeight(pieceHeight);
 
         const pieces: { index: number; dataUrl: string }[] = [];
 
