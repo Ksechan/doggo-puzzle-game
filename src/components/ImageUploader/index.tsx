@@ -7,7 +7,13 @@ import {
   puzzleState,
 } from "../../atom/puzzleState";
 
-const ImageUploader = () => {
+const ImageUploader = ({
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+}) => {
   const setSelectedImg = useSetRecoilState(puzzleImageState);
   const setPuzzleComplete = useSetRecoilState(puzzleCompleteState);
   const setPuzzleState = useSetRecoilState(puzzleState);
@@ -64,8 +70,8 @@ const ImageUploader = () => {
       reader.onload = async () => {
         const resizedImage = await resizeImage(
           reader.result as string,
-          363,
-          363
+          width,
+          height
         );
         setSelectedImg(resizedImage);
 
