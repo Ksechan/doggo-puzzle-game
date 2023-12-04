@@ -117,8 +117,7 @@ const PuzzleList = () => {
             dropItem && dropItem.removeAttribute("style");
             item.style.boxShadow = "0";
             item.style.transform = "scale(1)";
-            item.style.pointerEvents = "move";
-            item.style.pointerEvents = "move !important";
+            item.style.pointerEvents = "auto";
             document.body.removeAttribute("style");
             if (puzzleList.length === 1) {
               resetPuzzleValue();
