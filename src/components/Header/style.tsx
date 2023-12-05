@@ -24,12 +24,21 @@ export const RightWrap = styled.div`
   align-items: center;
 `;
 
-export const Icon = styled.img`
+export const Icon = styled.img<{ $marginRight?: boolean }>`
   width: 20px;
   height: 20px;
+  margin-right: ${({ $marginRight }) => ($marginRight ? 12 : 0)}px;
 
   @media screen and (min-width: 1024px) {
     width: 32px;
     height: 32px;
+    margin-right: ${({ $marginRight }) => ($marginRight ? 18 : 0)}px;
   }
+`;
+
+export const IconButton = styled.button`
+  background-color: #ffffff;
+  padding: 0px;
+  margin: 0px;
+  border: none;
 `;
