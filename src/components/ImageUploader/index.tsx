@@ -1,6 +1,7 @@
 import { useSetRecoilState } from "recoil";
-import { resizeImage } from "../../util";
+
 import * as Styled from "./style";
+import { resizeImage } from "../../util";
 import {
   puzzleCompleteState,
   puzzleImageState,
