@@ -26,6 +26,27 @@ vite 5.0.0
 ```
 typescript 5.2.2
 ```
+
+<br/>
+<br/>
+
+## 💾프로젝트 설치방법
+git clone
+```
+https://github.com/Ksechan/doggo-puzzle-game.git
+```
+
+dependency 설치
+```
+yarn install
+```
+
+dev 서버 실행
+```
+yarn dev
+```
+
+
 <br/>
 <br/>
 
