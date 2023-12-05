@@ -14,3 +14,8 @@ export const puzzleState = atom<{ index: number; dataUrl: string }[]>({
   key: "puzzleState",
   default: [],
 });
+
+export const forceRerender = atom<boolean>({
+  key: "forceRerender",
+  default: false,
+});
