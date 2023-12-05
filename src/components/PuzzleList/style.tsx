@@ -5,21 +5,25 @@ export const Content = styled.div`
   align-items: center;
   justify-content: start;
   background-color: #f7f7f7;
-  padding: 30px;
-  width: 390px;
+  width: 100%;
+  max-width: 345px;
   overflow: scroll;
-  padding: 8px;
+  padding: 8px 20px;
+  box-sizing: border-box;
 
   @media screen and (min-width: 1024px) {
-    width: 496px;
+    max-width: 496px;
   }
 `;
 
-export const PuzzleBlock = styled.button`
+export const PuzzleBlock = styled.button<{ $noMargin: boolean }>`
   min-width: 115px;
   min-height: 115px;
   border: 1px solid #ffffff;
-  margin-right: 24px;
+  margin-right: ${({ $noMargin }) => ($noMargin ? 0 : 24)}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   @media screen and (min-width: 1024px) {
     min-width: 160px;
