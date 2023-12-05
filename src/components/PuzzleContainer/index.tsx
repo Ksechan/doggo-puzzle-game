@@ -1,6 +1,7 @@
+import { useRecoilValue } from "recoil";
+
 import * as Styled from "./style";
 import { puzzleCompleteState, puzzleState } from "../../atom/puzzleState";
-import { useRecoilValue } from "recoil";
 import PuzzleList from "../PuzzleList";
 import Header from "../Header";
 
@@ -13,7 +14,7 @@ const PuzzleContainer = () => {
       <Header />
       <Styled.PuzzleAreaWrap>
         <Styled.PuzzleArea
-          border={puzzleCompleteValue}
+          $isBorder={puzzleCompleteValue}
           className="dnd-drop-wrap"
         >
           {[...Array(9).keys()].map((_, index) => {
@@ -21,18 +22,22 @@ const PuzzleContainer = () => {
               <Styled.Content
                 className={`dnd-drop-area ${index}`}
                 key={index}
-                border={puzzleCompleteValue}
+                $isBorder={puzzleCompleteValue}
               />
             );
           })}
         </Styled.PuzzleArea>
         <div className="item-wrap"></div>
-        <Styled.Title>
+        <Styled.Title
+          $complete={puzzleCompleteValue && puzzleValue.length === 0}
+        >
           {puzzleCompleteValue && puzzleValue.length === 0
             ? "축하합니다!"
             : "퍼즐 조각"}
         </Styled.Title>
-        <Styled.subtitle>
+        <Styled.subtitle
+          $complete={puzzleCompleteValue && puzzleValue.length === 0}
+        >
           {puzzleCompleteValue && puzzleValue.length === 0
             ? "퍼즐 맞추기에 성공하셨습니다!!"
             : "조각을 꾹 눌러서 위 퍼즐판에 넣고 뺄 수 있어요!"}
