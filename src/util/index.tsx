@@ -40,7 +40,7 @@ export const getDelta = (
   const move = moveEvent as MouseEvent;
 
   return {
-    deltaX: move.pageX - start.pageX,
-    deltaY: move.pageY - start.pageY,
+    deltaX: move.clientX - start.clientX,
+    deltaY: move.clientY - start.clientY,
   };
 };
