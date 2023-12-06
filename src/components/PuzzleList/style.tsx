@@ -24,6 +24,7 @@ export const PuzzleBlock = styled.button<{ $noMargin: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: unset;
 
   @media screen and (min-width: 1024px) {
     min-width: 160px;
@@ -35,7 +36,7 @@ export const PuzzleBlockImg = styled.img`
   width: 115px;
   height: 115px;
   background-color: #f7f7f7;
-  cursor: move;
+  cursor: grab;
 
   @media screen and (min-width: 1024px) {
     width: 160px;
