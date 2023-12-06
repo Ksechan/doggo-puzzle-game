@@ -34,6 +34,7 @@ const PuzzleList = () => {
     const onDragStartHandler = (startEvent: TouchEvent | MouseEvent) => {
       const item = startEvent.target as HTMLElement;
       const itemRect = item.getBoundingClientRect();
+      item.style.cursor = "grabbing";
 
       const dropAreaList =
         document.querySelectorAll<HTMLElement>(".dnd-drop-area");
@@ -64,9 +65,6 @@ const PuzzleList = () => {
         const listWrapArea = document
           .elementFromPoint(itemCenterX, itemCenterY)
           ?.closest<HTMLElement>(".list-area");
-        const listItemArea = document
-          .elementFromPoint(itemCenterX, itemCenterY)
-          ?.closest<HTMLElement>(".placeholder");
 
         dropAreaList.forEach((area) => {
           area.classList.remove("active");
@@ -83,9 +81,6 @@ const PuzzleList = () => {
         if (listWrapArea && item.parentElement?.tagName === "DIV") {
           listWrapArea.classList.add("active");
         }
-        if (listItemArea) {
-          listItemArea.classList.add("active");
-        }
         //--- Drop 영역 확인 END
       };
       const touchEndHandler = () => {
@@ -98,15 +93,13 @@ const PuzzleList = () => {
           ".dnd-drop-area.active"
         );
 
-        const listItemActive = document.querySelector<HTMLElement>(
-          ".placeholder.active"
-        );
+        const listAreaActive =
+          document.querySelector<HTMLElement>(".list-area.active");
 
         const isComplete =
           puzzle.index - 1 ===
           Number(dropItem?.classList[dropItem.classList.length - 2]);
         const itemParent = item.parentElement;
-        // console.log(item.classList);
         const oldItem = dropItem?.childNodes[0] as HTMLElement;
 
         // Drop
@@ -136,7 +129,6 @@ const PuzzleList = () => {
                 oldItemIndex - 1 === Number(oldItemParent);
 
               if (oldItemIsComplete) {
-                console.log("oldcom");
                 const duplicatedPuzzle = currentPuzzle.find(
                   (item) => item === oldItemIndex
                 );
@@ -144,7 +136,6 @@ const PuzzleList = () => {
                   ? null
                   : setCurrentPuzzle((prev) => [...prev, oldItemIndex]);
               } else {
-                console.log("oldnonb");
                 setCurrentPuzzle((prev) =>
                   prev.filter((item) => item !== oldItemIndex)
                 );
@@ -164,14 +155,11 @@ const PuzzleList = () => {
             setPuzzleList((prev) => [...prev, spliceItem[0]]);
           }
           // 퍼즐판에서 퍼즐조각리스트로 이동
-        } else if (listItemActive) {
-          if (!listItemActive.firstChild) {
-            listItemActive.appendChild(item);
-          }
-          const newNode = listItemActive.cloneNode(false) as HTMLElement;
-          newNode.classList.remove("active");
-          newNode.appendChild(item);
-          listItemActive.after(newNode);
+        } else if (listAreaActive) {
+          [...listArea]
+            .reverse()
+            .forEach((el) => (el.firstChild ? null : el.appendChild(item)));
+          setPuzzlePassCount((prev) => prev - 1);
         } else {
           // 제자리로
           item.style.left = `${itemRect.left}px`;
@@ -186,10 +174,12 @@ const PuzzleList = () => {
           item.style.position = "static";
         }, 200);
         item.style.boxShadow = "none";
+        item.style.cursor = "grab";
         dropItem && dropItem.removeAttribute("style");
         dropItem?.classList.remove("active");
         document.body.style.touchAction = "auto";
         document.body.classList.remove("hidden");
+        document.body.style.cursor = "auto";
         listWrapArea?.classList.remove("active");
         if (oldItem) {
           oldItem.style.transition = "all 200ms ease";
@@ -208,6 +198,8 @@ const PuzzleList = () => {
         item.style.zIndex = "9999";
         item.style.boxShadow = "8px 8px 10px rgba(0, 0, 0, .5)";
         item.style.transform = "scale(1.15)";
+        document.body.style.cursor = "grabbing";
+
         document.addEventListener(moveDragName, touchMoveHandler, {
           passive: false,
         });
@@ -252,7 +244,7 @@ const PuzzleList = () => {
   // 타겟이 퍼즐판에 넘어갔는지 유무
   const getTargetParent = (e: React.MouseEvent | React.TouchEvent) => {
     const target = e.target as HTMLElement;
-    return target.parentElement?.tagName;
+    return target.parentElement;
   };
 
   // 퍼즐판에 들어가있는 퍼즐조각의 갯수
@@ -290,7 +282,7 @@ const PuzzleList = () => {
         {puzzleList.map((item, idx) => {
           return (
             <Styled.PuzzleBlock
-              className={`placeholder`}
+              className={`${idx} placeholder`}
               key={item.index}
               $noMargin={puzzleList.length === idx + 1}
             >
@@ -300,7 +292,10 @@ const PuzzleList = () => {
                 onMouseMove={() => clearTimeout(clickTimeout)}
                 onMouseDown={(e: React.MouseEvent) => {
                   const targetParent = getTargetParent(e);
-                  if (idx === 0 || targetParent === "DIV") {
+                  const parentIndex = Number(
+                    targetParent?.classList[targetParent?.classList.length - 2]
+                  );
+                  if (parentIndex === 0 || targetParent?.tagName === "DIV") {
                     setPuzzle(item);
                     setReady(true);
                   }
@@ -308,7 +303,10 @@ const PuzzleList = () => {
                 onTouchMove={() => clearTimeout(clickTimeout)}
                 onTouchStart={(e: React.TouchEvent) => {
                   const targetParent = getTargetParent(e);
-                  if (idx === 0 || targetParent === "DIV") {
+                  const parentIndex = Number(
+                    targetParent?.classList[targetParent?.classList.length - 2]
+                  );
+                  if (parentIndex === 0 || targetParent?.tagName === "DIV") {
                     setPuzzle(item);
                     setReady(true);
                   }
