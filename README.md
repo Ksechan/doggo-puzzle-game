@@ -3,7 +3,7 @@
 보내주신 메일의 문제점을 토대로 버그수정 및 기능을 추가하였습니다
 
 <br/>
-![화면-기록-2023-12-07-오후-2 51 06](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/a8bb8deb-4083-4a3d-a010-4b20fb73760e)
+![화면-기록-2023-12-07-오후-2 51 06](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/7dddd911-0713-4afe-8e2c-012f0eb21a30)
 
 1. 퍼즐판 내에서 퍼즐조각 이동 가능
 2. 퍼즐판 위에 있는 퍼즐조각을 다시 리스트로 내릴 수 있게끔 수정
@@ -13,9 +13,9 @@
      - ex) '이 사진 그만 볼래요'를 클릭하여 퍼즐 조각 3개를 넘김 -> 나머지 6조각을 모두 퍼즐판에 올림 -> '이 사진 그만 볼래요'로 넘겼던 3조각이 앞으로 노출됨
     
 <br/>
-![scroll_before](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/8dc18f40-1203-48d6-9844-9fd016d817a3)
+![scroll_before](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/be6063d3-2427-4108-8fb8-5a1c1f19aadf)
 <br/>
-![scroll_after](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/aaf934c9-a2d6-4f74-a01c-6dd29d414371)
+![scroll_after](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/6d1992fd-922c-4a18-b92a-672523a1f3e0)
 
 3. 퍼즐조각을 드래그 중일때 마우스 휠 동작으로 스크롤할 경우 위치가 이상해지는 문제를 수정하였습니다.
 
