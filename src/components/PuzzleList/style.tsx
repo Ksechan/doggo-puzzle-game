@@ -18,7 +18,7 @@ export const Content = styled.div`
 
 export const PuzzleBlock = styled.button<{ $noMargin: boolean }>`
   min-width: 115px;
-  min-height: 115px;
+  height: 115px;
   border: 1px solid #ffffff;
   margin-right: ${({ $noMargin }) => ($noMargin ? 0 : 24)}px;
   display: flex;
