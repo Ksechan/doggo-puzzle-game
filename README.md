@@ -13,9 +13,9 @@
      - ex) '이 사진 그만 볼래요'를 클릭하여 퍼즐 조각 3개를 넘김 -> 나머지 6조각을 모두 퍼즐판에 올림 -> '이 사진 그만 볼래요'로 넘겼던 3조각이 앞으로 노출됨
     
 <br/>
-![scroll_before](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/be6063d3-2427-4108-8fb8-5a1c1f19aadf)
+![before](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/b7044b96-b535-4c76-948e-676bb9a76a3f)
 <br/>
-![scroll_after](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/6d1992fd-922c-4a18-b92a-672523a1f3e0)
+![after](https://github.com/Ksechan/doggo-puzzle-game/assets/74916518/676e559a-c018-47bd-8cb4-dccd982344ae)
 
 3. 퍼즐조각을 드래그 중일때 마우스 휠 동작으로 스크롤할 경우 위치가 이상해지는 문제를 수정하였습니다.
 
