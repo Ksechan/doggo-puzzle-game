@@ -21,6 +21,7 @@ const PuzzleList = () => {
     dataUrl: "",
   });
   const [puzzlePassCount, setPuzzlePassCount] = useState(0);
+  const [puzzleForcePass, setPuzzleForcePass] = useState(0);
   const [currentPuzzle, setCurrentPuzzle] = useState<number[]>([]);
 
   let clickTimeout: number | undefined;
@@ -151,8 +152,10 @@ const PuzzleList = () => {
             item.style.left = `${dropItem?.getBoundingClientRect().left}px`;
             item.style.top = `${dropItem?.getBoundingClientRect().top}px`;
             setPuzzlePassCount((prev) => prev + 1);
-            const spliceItem = puzzleList.splice(0, 1);
-            setPuzzleList((prev) => [...prev, spliceItem[0]]);
+            onImagePass();
+            if (childCount() === puzzleForcePass) {
+              passedItem();
+            }
           }
           // 퍼즐판에서 퍼즐조각리스트로 이동
         } else if (listAreaActive) {
@@ -228,13 +231,16 @@ const PuzzleList = () => {
   // 이 사진 그만 볼래요(배열의 마지막으로)
   const onImageUnVisible = () => {
     if (puzzlePassCount < 9) {
+      const spliceItem = puzzleList.splice(0, 1);
+      setPuzzleForcePass((prev) => prev + 1);
       setPuzzlePassCount((prev) => prev + 1);
-      onImagePass();
+      setPuzzleList((prev) => [...prev, spliceItem[0]]);
     }
   };
   // 넘기기(이 사진 그만 볼래요의 한칸 앞으로)
   const onImagePass = () => {
     const oldArray = puzzleList;
+    console.log(puzzleList);
     const item = oldArray.slice(0, 1);
     const newArray = oldArray
       .slice(1, puzzleList.length - puzzlePassCount)
@@ -257,8 +263,20 @@ const PuzzleList = () => {
     return child;
   };
 
+  const passedItem = () => {
+    setPuzzlePassCount(puzzleList.length - puzzleForcePass);
+    setPuzzleForcePass(0);
+    const count = puzzleList.length - puzzleForcePass;
+    const oldArray = puzzleList;
+    const item = oldArray.slice(count);
+    const emptyItem = oldArray.slice(0, count);
+    const newArray = item.concat(emptyItem);
+    setPuzzleList(newArray);
+  };
+
   // 퍼즐 성공
   useEffect(() => {
+    console.log(currentPuzzle);
     if (currentPuzzle.length === 9) {
       resetPuzzleValue();
       setPuzzleComplete(true);
@@ -275,6 +293,12 @@ const PuzzleList = () => {
       return () => cleanup();
     }
   }, [ready]);
+
+  useEffect(() => {
+    if (puzzleList.length !== 0 && childCount() === puzzleForcePass) {
+      passedItem();
+    }
+  }, [puzzleForcePass]);
 
   return (
     <Styled.PuzzleBlockWrap>
