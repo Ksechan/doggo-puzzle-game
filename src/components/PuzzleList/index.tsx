@@ -163,6 +163,7 @@ const PuzzleList = () => {
             .reverse()
             .forEach((el) => (el.firstChild ? null : el.appendChild(item)));
           setPuzzlePassCount((prev) => prev - 1);
+          item.style.border = "1px solid #cccccc";
         } else {
           // 제자리로
           item.style.left = `${itemRect.left}px`;
@@ -201,6 +202,7 @@ const PuzzleList = () => {
         item.style.zIndex = "9999";
         item.style.boxShadow = "8px 8px 10px rgba(0, 0, 0, .5)";
         item.style.transform = "scale(1.15)";
+        item.style.border = "none";
         document.body.style.cursor = "grabbing";
 
         document.addEventListener(moveDragName, touchMoveHandler, {

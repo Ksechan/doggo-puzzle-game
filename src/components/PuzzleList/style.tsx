@@ -37,6 +37,7 @@ export const PuzzleBlockImg = styled.img`
   height: 115px;
   background-color: #f7f7f7;
   cursor: grab;
+  border: 1px solid #cccccc;
 
   @media screen and (min-width: 1024px) {
     width: 160px;
