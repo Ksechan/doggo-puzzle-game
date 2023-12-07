@@ -8,9 +8,14 @@ export const resizeImage = (
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
+      const scaleFactor = Math.min(width / img.width, height / img.height);
+      const newWidth = img.width * scaleFactor;
+      const newHeight = img.height * scaleFactor;
       canvas.width = width;
       canvas.height = height;
-      context?.drawImage(img, 0, 0, width, height);
+      const x = (width - newWidth) / 2;
+      const y = (height - newHeight) / 2;
+      context?.drawImage(img, x, y, newWidth, newHeight);
       resolve(canvas.toDataURL());
     };
     img.src = image as string;
